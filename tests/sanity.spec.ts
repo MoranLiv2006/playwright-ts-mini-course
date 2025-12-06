@@ -1,52 +1,57 @@
-import { test } from '@playwright/test';
+import {test} from '@playwright/test';
 import LoginPage from "../src/pages/LoginPage";
 import ProductsPage from "../src/pages/ProductsPage";
 import ApplicationURL from "../helpers/ApplicationURL";
 import YourCartPage from "../src/pages/YourCartPage";
+import PageTitles from "../helpers/PageTitles";
+import CheckoutYourInformationPage from "../src/pages/CheckoutYourInformationPage";
+import CheckoutOverview from "../src/pages/CheckoutOverview";
 
-test('sanity test', async ({ page }) => {
+test.describe("Sanity Tests Block", () => {
 
-    const loginPage = new LoginPage(page);
-    await loginPage.loginToApplication();
+    const products = ["Sauce Labs Bolt T-Shirt", "Sauce Labs Bike Light", "Sauce Labs Onesie"]
 
-    const productsPage = new ProductsPage(page);
-    await productsPage.verifyTitle("Products")
+    test('Validate simple login and transaction', async ({page}) => {
 
-    const yourCartPage = new YourCartPage(page);
+        const loginPage = new LoginPage(page);
+        await loginPage.loginToApplication();
 
-    await productsPage.chooseProductByTitle("Sauce Labs Bolt T-Shirt")
-    await productsPage.chooseProductByTitle("Sauce Labs Bike Light")
-    await productsPage.chooseProductByTitle("Sauce Labs Onesie")
-    // await page.locator('[data-test="add-to-cart-sauce-labs-backpack"]').click();
-    // await page.locator('[data-test="add-to-cart-sauce-labs-bike-light"]').click();
-    // await page.locator('[data-test="add-to-cart-sauce-labs-bolt-t-shirt"]').dblclick();
-    await productsPage.validateNumberOfItemsInCart("3");
-    await productsPage.goToCart();
+        const productsPage = new ProductsPage(page);
+        await productsPage.verifyTitle(PageTitles.PRODUCTS_PAGE)
 
-    await yourCartPage.validateUrl(ApplicationURL.YOUR_CART_PAGE_URL)
-    await yourCartPage.verifyTitle("Your Cart")
-    // await page.locator('[data-test="shopping-cart-link"]').click();
-    await page.locator('[data-test="checkout"]').click();
+        const yourCartPage = new YourCartPage(page);
 
-    await page.locator('[data-test="firstName"]').click();
-    await page.locator('[data-test="firstName"]').fill('Moran');
-    await page.locator('.checkout_info').click();
-    await page.locator('[data-test="lastName"]').click();
-    await page.locator('[data-test="lastName"]').fill('Liv');
-    await page.locator('[data-test="lastName"]').press('Tab');
-    await page.locator('[data-test="postalCode"]').fill('123456');
-    await page.locator('[data-test="continue"]').click();
-    await page.locator('[data-test="finish"]').click();
-    await page.locator('[data-test="back-to-products"]').click();
-    await page.getByRole('button', { name: 'Open Menu' }).click();
-    await page.locator('[data-test="reset-sidebar-link"]').dblclick();
-    await page.locator('[data-test="logout-sidebar-link"]').click();
-});
+        for (let product of products) {
+            await productsPage.chooseProductByTitle(product)
+        }
 
-test('demo test', async ({ page }) => {
+        await productsPage.validateNumberOfItemsInCart(products.length.toString());
+        await productsPage.goToCart();
 
-    const loginPage = new LoginPage(page);
-    await loginPage.loginToApplication(process.env.PERFORMANCE_GLITCH_USER);
-    await loginPage.validateUrl(`${ApplicationURL.BASE_ULR}inventory.html`)
+        await yourCartPage.validateUrl(ApplicationURL.YOUR_CART_PAGE_URL)
+        await yourCartPage.verifyTitle(PageTitles.YOUR_CART_PAGE)
+        await yourCartPage.validateNumberOfItemsInCart(products.length)
 
-});
+        for (let product of products) {
+            await yourCartPage.validateProductExistsInCart(product)
+        }
+
+        await yourCartPage.goToCheckout();
+
+        const checkYourInformationPage = new CheckoutYourInformationPage(page)
+        await yourCartPage.validateUrl(ApplicationURL.CHECKOUT_YOUR_INFORMATION_PAGE_URL)
+        await checkYourInformationPage.fillCustomerDetails("Moran", "Liv", "V4P0H5")
+        await yourCartPage.verifyTitle(PageTitles.CHECKOUT_YOUR_INFORMATION_PAGE)
+        await checkYourInformationPage.goToCheckoutOverview()
+
+
+        const checkoutOverviewPage = new CheckoutOverview(page)
+        await yourCartPage.validateUrl(ApplicationURL.CHECKOUT_OVERVIEW_PAGE_URL)
+        await yourCartPage.verifyTitle(PageTitles.CHECKOUT_OVERVIEW_PAGE)
+        await checkoutOverviewPage.goToCheckoutComplete();
+        await page.locator('[data-test="back-to-products"]').click();
+        await page.getByRole('button', {name: 'Open Menu'}).click();
+        await page.locator('[data-test="reset-sidebar-link"]').dblclick();
+        await page.locator('[data-test="logout-sidebar-link"]').click();
+    });
+})

@@ -23,6 +23,12 @@ export abstract class BasePage {
         })
     }
 
+    protected async fillText(element: Locator, textToFill: string) {
+        await test.step(`Filling ${textToFill} into the ${element} element`, async () => {
+            await element.fill(textToFill);
+        })
+    }
+
     public async verifyTitle(expected_title: string) {
         await this.validateElementText(this.page.locator("span[data-test='title']"), expected_title)
     }
