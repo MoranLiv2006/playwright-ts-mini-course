@@ -2,6 +2,7 @@ import { test } from '@playwright/test';
 import LoginPage from "../src/pages/LoginPage";
 import ProductsPage from "../src/pages/ProductsPage";
 import ApplicationURL from "../helpers/ApplicationURL";
+import YourCartPage from "../src/pages/YourCartPage";
 
 test('sanity test', async ({ page }) => {
 
@@ -11,11 +12,22 @@ test('sanity test', async ({ page }) => {
     const productsPage = new ProductsPage(page);
     await productsPage.verifyTitle("Products")
 
-    await page.locator('[data-test="add-to-cart-sauce-labs-backpack"]').click();
-    await page.locator('[data-test="add-to-cart-sauce-labs-bike-light"]').click();
-    await page.locator('[data-test="add-to-cart-sauce-labs-bolt-t-shirt"]').dblclick();
-    await page.locator('[data-test="shopping-cart-link"]').click();
+    const yourCartPage = new YourCartPage(page);
+
+    await productsPage.chooseProductByTitle("Sauce Labs Bolt T-Shirt")
+    await productsPage.chooseProductByTitle("Sauce Labs Bike Light")
+    await productsPage.chooseProductByTitle("Sauce Labs Onesie")
+    // await page.locator('[data-test="add-to-cart-sauce-labs-backpack"]').click();
+    // await page.locator('[data-test="add-to-cart-sauce-labs-bike-light"]').click();
+    // await page.locator('[data-test="add-to-cart-sauce-labs-bolt-t-shirt"]').dblclick();
+    await productsPage.validateNumberOfItemsInCart("3");
+    await productsPage.goToCart();
+
+    await yourCartPage.validateUrl(ApplicationURL.YOUR_CART_PAGE_URL)
+    await yourCartPage.verifyTitle("Your Cart")
+    // await page.locator('[data-test="shopping-cart-link"]').click();
     await page.locator('[data-test="checkout"]').click();
+
     await page.locator('[data-test="firstName"]').click();
     await page.locator('[data-test="firstName"]').fill('Moran');
     await page.locator('.checkout_info').click();

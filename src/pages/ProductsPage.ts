@@ -3,14 +3,30 @@ import {BasePage} from "./BasePage";
 
 export default class ProductsPage extends BasePage {
 
-    private pageTitleElement: Locator
+    private itemDescriptionElement: Locator;
+    private shoppingCartBudgeElement: Locator;
 
     constructor(protected page: Page) {
         super(page);
-        this.pageTitleElement = page.locator("span[data-test='title']")
+        this.itemDescriptionElement = page.locator("div[data-test='inventory-item-description']");
+        this.shoppingCartBudgeElement = page.locator("a[class='shopping_cart_link']");
     }
 
-    public async verifyTitle(expected_title: string) {
-        await this.validateElementText(this.pageTitleElement, expected_title)
+    public async chooseProductByTitle(desiredProduct: string) {
+        await this.clickElement(this.itemDescriptionElement.filter({hasText: desiredProduct}).locator("button"))
+        // for(let product of await this.itemDescriptionElement.all()) {
+        //     const productTitle = await product.locator("div[data-test='inventory-item-name']").innerText();
+        //     if (productTitle === desiredProduct) {
+        //         await product.locator("button").click();
+        //     }
+        // }
+    }
+
+    public async validateNumberOfItemsInCart(expectedNumberOfItems: string) {
+        await this.validateElementText(this.shoppingCartBudgeElement, expectedNumberOfItems)
+    }
+
+    public async goToCart() {
+        await this.clickElement(this.shoppingCartBudgeElement);
     }
 }

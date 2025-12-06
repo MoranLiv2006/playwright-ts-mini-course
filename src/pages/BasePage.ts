@@ -16,4 +16,14 @@ export abstract class BasePage {
             await expect(element).toContainText(expectedText, {timeout: 30000});
         })
     }
+
+    protected async clickElement(element: Locator) {
+        await test.step(`Clicking the ${element}`, async () => {
+            await element.click();
+        })
+    }
+
+    public async verifyTitle(expected_title: string) {
+        await this.validateElementText(this.page.locator("span[data-test='title']"), expected_title)
+    }
 }
