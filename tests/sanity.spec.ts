@@ -1,6 +1,5 @@
 import { test } from '@playwright/test';
 import LoginPage from "../src/pages/LoginPage";
-import UserCredentials from "../helpers/UserCredentials";
 import ProductsPage from "../src/pages/ProductsPage";
 import ApplicationURL from "../helpers/ApplicationURL";
 
@@ -35,7 +34,7 @@ test('sanity test', async ({ page }) => {
 test('demo test', async ({ page }) => {
 
     const loginPage = new LoginPage(page);
-    await loginPage.loginToApplication(UserCredentials.PERFORMANCE_GLITCH_USER);
+    await loginPage.loginToApplication(process.env.PERFORMANCE_GLITCH_USER);
     await loginPage.validateUrl(`${ApplicationURL.BASE_ULR}inventory.html`)
 
 });
