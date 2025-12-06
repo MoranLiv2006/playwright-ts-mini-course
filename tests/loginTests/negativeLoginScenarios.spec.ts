@@ -11,31 +11,31 @@ test.describe("Negative Login Scenarios", () => {
         loginPage = new LoginPage(page);
     })
 
-    test("Login with locked_out_user", async ({page}) => {
+    test("Login with locked_out_user", async () => {
         await loginPage.loginToApplication(process.env.LOCKED_OUT_USER);
         await loginPage.validateErrorMessage(ErrorMessages.LOGIN_WITH_LOCKED_USER)
         await loginPage.validateUrl(ApplicationURL.BASE_ULR)
     })
 
-    test("Login with incorrect username", async ({page}) => {
+    test("Login with incorrect username", async () => {
         await loginPage.loginToApplication("test");
         await loginPage.validateErrorMessage(ErrorMessages.LOGIN_WITH_INCORRECT_VALUE)
         await loginPage.validateUrl(ApplicationURL.BASE_ULR)
     })
 
-    test("Login with incorrect password", async ({page}) => {
+    test("Login with incorrect password", async ({}) => {
         await loginPage.loginToApplication(process.env.LOCKED_OUT_USER, "test");
         await loginPage.validateErrorMessage(ErrorMessages.LOGIN_WITH_INCORRECT_VALUE)
         await loginPage.validateUrl(ApplicationURL.BASE_ULR)
     })
 
-    test("Login with missing username", async ({page}) => {
+    test("Login with missing username", async () => {
         await loginPage.loginToApplication("");
         await loginPage.validateErrorMessage(ErrorMessages.LOGIN_WITH_MISSING_USERNAME)
         await loginPage.validateUrl(ApplicationURL.BASE_ULR)
     })
 
-    test("Login with missing password", async ({page}) => {
+    test("Login with missing password", async () => {
         await loginPage.loginToApplication(process.env.STANDARD_USER, "");
         await loginPage.validateErrorMessage(ErrorMessages.LOGIN_WITH_MISSING_PASSWORD)
         await loginPage.validateUrl(ApplicationURL.BASE_ULR)
