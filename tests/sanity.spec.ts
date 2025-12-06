@@ -1,11 +1,16 @@
 import { test } from '@playwright/test';
 import LoginPage from "../src/pages/LoginPage";
 import UserCredentials from "../helpers/UserCredentials";
+import ProductsPage from "../src/pages/ProductsPage";
+import ApplicationURL from "../helpers/ApplicationURL";
 
 test('sanity test', async ({ page }) => {
 
     const loginPage = new LoginPage(page);
     await loginPage.loginToApplication();
+
+    const productsPage = new ProductsPage(page);
+    await productsPage.verifyTitle("Products")
 
     await page.locator('[data-test="add-to-cart-sauce-labs-backpack"]').click();
     await page.locator('[data-test="add-to-cart-sauce-labs-bike-light"]').click();
@@ -31,5 +36,6 @@ test('demo test', async ({ page }) => {
 
     const loginPage = new LoginPage(page);
     await loginPage.loginToApplication(UserCredentials.PERFORMANCE_GLITCH_USER);
+    await loginPage.validateUrl(`${ApplicationURL.BASE_ULR}inventory.html`)
 
 });
